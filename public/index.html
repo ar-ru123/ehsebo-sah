@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="احسبه صح - تطبيق إدارة الميزانية الذكي. إدارة نفقاتك بسهولة مع دعم عملات متعددة وتقارير تفصيلية.">
+    <meta name="keywords" content="إدارة الميزانية، تطبيق مالي، حاسبة نفقات، تقارير مالية، عملات متعددة">
+    <meta name="theme-color" content="#007AFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta property="og:title" content="احسبه صح - تطبيق إدارة الميزانية">
+    <meta property="og:description" content="إدارة نفقاتك بذكاء مع دعم اللغة العربية والإنجليزية">
+    <meta property="og:image" content="/assets/images/icon.png">
+    <meta property="og:url" content="https://ehsebo-sah.com">
+    <title>احسبه صح - إدارة الميزانية الذكية</title>
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/images/icon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #43A047;
+            --text-primary: #11181C;
+            --text-secondary: #687076;
+            --bg-primary: #FFFFFF;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-primary);
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 1rem 0;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .app-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+        }
+
+        .app-frame.active {
+            display: block;
+        }
+
+        .error-message {
+            color: #FF3B30;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .retry-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: opacity 0.3s;
+        }
+
+        .retry-button:hover {
+            opacity: 0.8;
+        }
+
+        .retry-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Mobile detection styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            p {
+                font-size: 0.9rem;
+            }
+
+            .logo {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+            }
+        }
+
+        /* iPad and tablet detection */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .container {
+                padding: 3rem 2rem;
+            }
+        }
+
+        /* Desktop detection */
+        @media (min-width: 1025px) {
+            .container {
+                padding: 4rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="loading-container">
+            <div class="logo">💰</div>
+            <h1>احسبه صح</h1>
+            <p id="status-text">جاري تحميل التطبيق...</p>
+            <div class="spinner"></div>
+            <div class="error-message" id="error-message"></div>
+            <button class="retry-button" id="retry-button" style="display: none;">إعادة المحاولة</button>
+        </div>
+    </div>
+
+    <iframe id="app-frame" class="app-frame"></iframe>
+
+    <script>
+        // Platform detection and routing
+        const APP_CONFIG = {
+            WEB_URL: window.location.origin,
+            EXPO_URL: 'exp://8081-ik2mg8fjwadrzlmw44w2n-1d2fd429.us2.manus.computer',
+            APP_STORE_URL: 'https://apps.apple.com/app/id123456789',
+            PLAY_STORE_URL: 'https://play.google.com/store/apps/details?id=space.manus.ehsebo.sah',
+        };
+
+        const statusText = document.getElementById('status-text');
+        const errorMessage = document.getElementById('error-message');
+        const retryButton = document.getElementById('retry-button');
+        const appFrame = document.getElementById('app-frame');
+
+        // Detect platform
+        function detectPlatform() {
+            const ua = navigator.userAgent.toLowerCase();
+            
+            // Check for mobile/tablet
+            const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
+            const isTablet = /ipad|android(?!.*mobi)/i.test(ua);
+            const isIOS = /iphone|ipad|ipod/.test(ua);
+            const isAndroid = /android/.test(ua);
+            
+            // Check for native app context
+            const isExpo = ua.includes('expojs');
+            const isNativeApp = isExpo || (window.navigator.standalone === true);
+            
+            return {
+                isMobile,
+                isTablet,
+                isIOS,
+                isAndroid,
+                isNativeApp,
+                isDesktop: !isMobile && !isTablet,
+                userAgent: ua
+            };
+        }
+
+        // Load app based on platform
+        async function loadApp() {
+            try {
+                const platform = detectPlatform();
+                
+                console.log('Platform detected:', platform);
+                
+                // Update status
+                if (platform.isNativeApp) {
+                    statusText.textContent = 'جاري تحميل التطبيق الأصلي...';
+                } else if (platform.isMobile || platform.isTablet) {
+                    statusText.textContent = 'جاري تحميل نسخة الموبايل...';
+                } else {
+                    statusText.textContent = 'جاري تحميل نسخة الويب...';
+                }
+
+                // Wait for app to be ready
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Load the web app
+                loadWebApp();
+
+            } catch (error) {
+                console.error('Error loading app:', error);
+                showError('حدث خطأ أثناء تحميل التطبيق. يرجى إعادة المحاولة.');
+            }
+        }
+
+        // Load web app in iframe or redirect
+        function loadWebApp() {
+            try {
+                // For web platform, we can either:
+                // 1. Load the app in an iframe (if it's a separate web app)
+                // 2. Redirect to the app URL
+                // 3. Load the app directly in the current page
+
+                // Option: Redirect to the app
+                const appPath = window.location.origin;
+                
+                // Check if we're already at the app root
+                if (window.location.pathname === '/' && !window.location.search.includes('app=true')) {
+                    // Redirect to the app with a parameter to avoid infinite loop
+                    window.location.href = appPath + '/?app=true';
+                } else {
+                    // App is loaded, hide loading screen
+                    document.querySelector('.loading-container').style.display = 'none';
+                    statusText.textContent = 'تم التحميل بنجاح!';
+                }
+
+            } catch (error) {
+                console.error('Error loading web app:', error);
+                showError('فشل تحميل التطبيق. يرجى التحقق من الاتصال بالإنترنت.');
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            retryButton.style.display = 'block';
+            document.querySelector('.spinner').style.display = 'none';
+            statusText.textContent = 'حدث خطأ';
+        }
+
+        // Retry button handler
+        retryButton.addEventListener('click', () => {
+            errorMessage.classList.remove('show');
+            retryButton.style.display = 'none';
+            document.querySelector('.spinner').style.display = 'block';
+            statusText.textContent = 'جاري إعادة المحاولة...';
+            loadApp();
+        });
+
+        // Handle app ready event
+        window.addEventListener('appReady', () => {
+            console.log('App is ready');
+            document.querySelector('.loading-container').style.display = 'none';
+        });
+
+        // Handle app errors
+        window.addEventListener('error', (event) => {
+            console.error('App error:', event.error);
+            showError('حدث خطأ في التطبيق. يرجى إعادة تحميل الصفحة.');
+        });
+
+        // Start loading app on page load
+        window.addEventListener('load', () => {
+            // Check if app parameter is set to avoid infinite redirect
+            const params = new URLSearchParams(window.location.search);
+            if (!params.has('app')) {
+                loadApp();
+            } else {
+                // App is loaded, hide loading screen
+                document.querySelector('.loading-container').style.display = 'none';
+            }
+        });
+
+        // Fallback: Start loading after a short delay
+        setTimeout(() => {
+            if (document.querySelector('.loading-container').style.display !== 'none') {
+                const params = new URLSearchParams(window.location.search);
+                if (!params.has('app')) {
+                    loadApp();
+                }
+            }
+        }, 500);
+    </script>
+</body>
+</html>
