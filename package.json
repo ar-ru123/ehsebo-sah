@@ -1,7 +1,7 @@
 {
-  "homepage": "https://ar-ru123.github.io/ehsebo-sah",
   "name": "app-template",
   "version": "1.0.0",
+  "homepage": "https://ar-ru123.github.io/ehsebo-sah",
   "type": "module",
   "private": true,
   "main": "expo-router/entry",
