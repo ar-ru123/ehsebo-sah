@@ -36,6 +36,8 @@ const config: ExpoConfig = {
     bundleIdentifier: env.iosBundleId,
     infoPlist: {
       UIBackgroundModes: ["audio"],
+    experiments: {
+      baseUrl: "/ehsebo-sah",
     },
   },
   android: {
