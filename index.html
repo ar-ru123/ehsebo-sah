@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="احسبه صح - تطبيق إدارة الميزانية الذكي. إدارة نفقاتك بسهولة مع دعم عملات متعددة وتقارير تفصيلية.">
+    <meta name="description" content="احسبه صح - تطبيق إدارة الميزانية الذكي. إدارة نفقاتك بسهولة مع دعم عملات متعددة وتقارير دقيقة.">
     <meta name="keywords" content="إدارة الميزانية، تطبيق مالي، حاسبة نفقات، تقارير مالية، عملات متعددة">
     <meta name="theme-color" content="#007AFF">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -220,17 +220,17 @@
 
         // Detect platform
         function detectPlatform() {
-            const ua = navigator.userAgent.toLowerCase();
+            const ua = navigator.userAgent || '';
             
             // Check for mobile/tablet
-            const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
-            const isTablet = /ipad|android(?!.*mobi)/i.test(ua);
-            const isIOS = /iphone|ipad|ipod/.test(ua);
-            const isAndroid = /android/.test(ua);
+            const isMobile = /android|webos|iphone|ipod|blackberry|iemobile|opera mini/i.test(ua);
+            const isTablet = /ipad|tablet|android(?!.*mobi)/i.test(ua);
+            const isIOS = /iphone|ipad|ipod/i.test(ua);
+            const isAndroid = /android/i.test(ua);
             
             // Check for native app context
-            const isExpo = ua.includes('expojs');
-            const isNativeApp = isExpo || (window.navigator.standalone === true);
+            const isExpo = ua.toLowerCase().includes('expojs');
+            const isNativeApp = isExpo || (window.navigator && window.navigator.standalone === true);
             
             return {
                 isMobile,
@@ -259,7 +259,7 @@
                     statusText.textContent = 'جاري تحميل نسخة الويب...';
                 }
 
-                // Wait for app to be ready
+                // Wait for app to be ready (simulate)
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
                 // Load the web app
@@ -274,23 +274,18 @@
         // Load web app in iframe or redirect
         function loadWebApp() {
             try {
-                // For web platform, we can either:
-                // 1. Load the app in an iframe (if it's a separate web app)
-                // 2. Redirect to the app URL
-                // 3. Load the app directly in the current page
-
-                // Option: Redirect to the app
-                const appPath = window.location.origin;
-                
-                // Check if we're already at the app root
-                if (window.location.pathname === '/' && !window.location.search.includes('app=true')) {
-                    // Redirect to the app with a parameter to avoid infinite loop
-                    window.location.href = appPath + '/?app=true';
-                } else {
-                    // App is loaded, hide loading screen
-                    document.querySelector('.loading-container').style.display = 'none';
-                    statusText.textContent = 'تم التحميل بنجاح!';
+                // Build URL preserving path and existing params, then set app=true to avoid infinite loop
+                const currentUrl = new URL(window.location.href);
+                if (!currentUrl.searchParams.has('app')) {
+                    currentUrl.searchParams.set('app', 'true');
+                    // Use replace to avoid adding extra history entry (optional)
+                    window.location.href = currentUrl.toString();
+                    return;
                 }
+
+                // If app param already present, hide loading screen
+                document.querySelector('.loading-container').style.display = 'none';
+                statusText.textContent = 'تم التحميل بنجاح!';
 
             } catch (error) {
                 console.error('Error loading web app:', error);
@@ -322,9 +317,10 @@
             document.querySelector('.loading-container').style.display = 'none';
         });
 
-        // Handle app errors
+        // Handle uncaught errors
         window.addEventListener('error', (event) => {
-            console.error('App error:', event.error);
+            // event.error may be undefined for resource errors; handle gracefully
+            console.error('App error:', event.error || event.message || event);
             showError('حدث خطأ في التطبيق. يرجى إعادة تحميل الصفحة.');
         });
 
